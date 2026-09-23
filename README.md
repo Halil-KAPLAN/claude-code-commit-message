@@ -1,5 +1,9 @@
 # Commit Message Generator for Claude Code
 
+A **Visual Studio Code extension** that writes your Git commit messages with Claude Code.
+
+**Install:** [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=halilkaplan.claude-code-commit-message), or search for *Commit Message Generator for Claude Code* in the VS Code Extensions view (`Ctrl+Shift+X`). A `.vsix` for manual install is on the [Releases](https://github.com/Halil-KAPLAN/claude-code-commit-message/releases) page.
+
 Click the ✨ button in the Source Control view and a commit message for your changes is written into the commit box.
 
 It runs through the **Claude Code CLI you are already logged into**, so there is no API key to set up.
@@ -16,6 +20,7 @@ It runs through the **Claude Code CLI you are already logged into**, so there is
 ## Requirements
 
 - [Claude Code](https://claude.com/claude-code) installed and logged in (`claude` must work in a terminal). Usage counts against the account the CLI is logged in with.
+- [Visual Studio Code](https://code.visualstudio.com/) 1.90 or newer.
 - Git.
 
 ## Settings
