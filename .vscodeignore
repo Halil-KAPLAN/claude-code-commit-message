@@ -2,3 +2,6 @@ images/icon.svg
 *.vsix
 .git/**
 .gitignore
+publisher-logo.png
+extension-icon-128.png
+images/publisher-logo.svg
