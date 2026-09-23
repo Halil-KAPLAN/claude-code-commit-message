@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#e9825c"/>
+      <stop offset="1" stop-color="#b8472a"/>
+    </linearGradient>
+  </defs>
+  <rect width="256" height="256" rx="56" fill="url(#bg)"/>
+  <!-- commit graph -->
+  <path d="M84 40 V216" stroke="#fff7f0" stroke-width="16" stroke-linecap="round" fill="none" opacity="0.55"/>
+  <circle cx="84" cy="128" r="30" fill="#b8472a" stroke="#fff7f0" stroke-width="16"/>
+  <!-- message lines -->
+  <rect x="134" y="150" width="84" height="14" rx="7" fill="#fff7f0"/>
+  <rect x="134" y="180" width="58" height="14" rx="7" fill="#fff7f0" opacity="0.7"/>
+  <!-- sparkle -->
+  <path d="M176 36 C180 70 188 78 222 82 C188 86 180 94 176 128 C172 94 164 86 130 82 C164 78 172 70 176 36 Z" fill="#fff7f0"/>
+</svg>

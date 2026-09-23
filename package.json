@@ -1,0 +1,127 @@
+{
+  "name": "claude-code-commit-message",
+  "displayName": "Commit Message Generator for Claude Code",
+  "description": "One click in Source Control writes a commit message from your changes, using your local Claude Code CLI login. No API key needed.",
+  "version": "1.0.0",
+  "publisher": "halilkaplan",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "extensionKind": [
+    "workspace"
+  ],
+  "main": "./extension.js",
+  "activationEvents": [],
+  "extensionDependencies": [
+    "vscode.git"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "claudeCommitMsg.generate",
+        "title": "Generate Commit Message (Claude)",
+        "icon": "$(sparkle)"
+      },
+      {
+        "command": "claudeCommitMsg.stop",
+        "title": "Stop Generating Commit Message",
+        "icon": "$(debug-stop)"
+      }
+    ],
+    "menus": {
+      "scm/title": [
+        {
+          "command": "claudeCommitMsg.generate",
+          "when": "scmProvider == git && !claudeCommitMsg.running",
+          "group": "navigation@0"
+        },
+        {
+          "command": "claudeCommitMsg.stop",
+          "when": "scmProvider == git && claudeCommitMsg.running",
+          "group": "navigation@0"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "claudeCommitMsg.stop",
+          "when": "claudeCommitMsg.running"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Commit Message Generator for Claude Code",
+      "properties": {
+        "claudeCommitMsg.model": {
+          "type": "string",
+          "default": "haiku",
+          "enum": [
+            "haiku",
+            "sonnet",
+            "opus"
+          ],
+          "enumDescriptions": [
+            "Fastest (recommended, about 3s)",
+            "Better wording, slower",
+            "Best quality, slowest"
+          ],
+          "description": "Claude model used to write the message."
+        },
+        "claudeCommitMsg.language": {
+          "type": "string",
+          "default": "English",
+          "enum": [
+            "English",
+            "Turkish",
+            "German",
+            "French",
+            "Spanish",
+            "Italian",
+            "Portuguese",
+            "Russian",
+            "Chinese",
+            "Japanese",
+            "Korean",
+            "Arabic"
+          ],
+          "description": "Language of the generated commit message."
+        },
+        "claudeCommitMsg.maxDiffChars": {
+          "type": "integer",
+          "default": 60000,
+          "minimum": 2000,
+          "maximum": 200000,
+          "description": "Diffs longer than this are truncated before being sent to Claude."
+        },
+        "claudeCommitMsg.claudePath": {
+          "type": "string",
+          "default": "claude",
+          "scope": "machine",
+          "description": "Path to the Claude Code CLI. Leave as \"claude\" if it is on your PATH."
+        }
+      }
+    }
+  },
+  "author": {
+    "name": "Halil KAPLAN"
+  },
+  "icon": "images/icon.png",
+  "galleryBanner": {
+    "color": "#b8472a",
+    "theme": "dark"
+  },
+  "categories": [
+    "SCM Providers",
+    "AI",
+    "Other"
+  ],
+  "keywords": [
+    "claude",
+    "claude code",
+    "commit",
+    "commit message",
+    "git",
+    "ai",
+    "conventional commits"
+  ]
+}
