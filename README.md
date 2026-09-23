@@ -15,7 +15,7 @@ It runs through the **Claude Code CLI you are already logged into**, so there is
 
 ## Requirements
 
-- [Claude Code](https://claude.com/claude-code) installed and logged in (`claude` must work in a terminal).
+- [Claude Code](https://claude.com/claude-code) installed and logged in (`claude` must work in a terminal). Usage counts against the account the CLI is logged in with.
 - Git.
 
 ## Settings
@@ -26,6 +26,10 @@ It runs through the **Claude Code CLI you are already logged into**, so there is
 | `claudeCommitMsg.language` | `English` | Language of the message |
 | `claudeCommitMsg.maxDiffChars` | `60000` | Longer diffs are truncated |
 | `claudeCommitMsg.claudePath` | `claude` | Path to the CLI if it is not on your PATH |
+
+## Installing without the Marketplace
+
+Download the `.vsix` from [Releases](https://github.com/Halil-KAPLAN/claude-code-commit-message/releases), then in VS Code: **Extensions → ⋯ → Install from VSIX…**
 
 ## Privacy
 

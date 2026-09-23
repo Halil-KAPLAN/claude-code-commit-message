@@ -2,9 +2,17 @@
   "name": "claude-code-commit-message",
   "displayName": "Commit Message Generator for Claude Code",
   "description": "One click in Source Control writes a commit message from your changes, using your local Claude Code CLI login. No API key needed.",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "publisher": "halilkaplan",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Halil-KAPLAN/claude-code-commit-message.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Halil-KAPLAN/claude-code-commit-message/issues"
+  },
+  "homepage": "https://github.com/Halil-KAPLAN/claude-code-commit-message#readme",
   "engines": {
     "vscode": "^1.90.0"
   },

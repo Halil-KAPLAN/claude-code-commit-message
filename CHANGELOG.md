@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.2
+
+- Clear error with a **Log In** button when Claude Code is not logged in (previously the CLI's error text could end up in the commit box).
+- **Install Claude Code** button when the CLI is not found.
+- Source code on GitHub.
+
 ## 1.0.1
 
 - The stop button now appears in the same place as the generate button.

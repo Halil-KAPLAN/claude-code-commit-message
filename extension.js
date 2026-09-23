@@ -119,7 +119,8 @@ async function generate(arg) {
       ].join('\n');
 
       let text = '',
-        buf = '';
+        buf = '',
+        failure = null;
       repo.inputBox.value = '';
       const model = MODELS.includes(cfg.get('model')) ? cfg.get('model') : 'haiku';
       const claude = claudeCommand(cfg.get('claudePath') || 'claude', [
@@ -161,12 +162,21 @@ async function generate(arg) {
             if (d && d.type === 'text_delta') {
               text += d.text;
               repo.inputBox.value = text;
-            } else if (ev.type === 'result' && typeof ev.result === 'string') {
-              text = ev.result;
+            } else if (ev.type === 'assistant' && ev.error) {
+              failure = { code: ev.error };
+            } else if (ev.type === 'result') {
+              // The CLI exits 0 on API/auth errors; the error text arrives here as the "result".
+              if (ev.is_error) failure = { code: (failure && failure.code) || ev.terminal_reason, text: ev.result };
+              else if (typeof ev.result === 'string') text = ev.result;
             }
           }
         },
       });
+      if (failure) {
+        const err = new Error(failure.text || failure.code || 'Unknown error');
+        err.code = failure.code;
+        throw err;
+      }
       repo.inputBox.value = clean(text);
     });
   } catch (e) {
@@ -174,16 +184,42 @@ async function generate(arg) {
       if (!repo.inputBox.value.trim()) repo.inputBox.value = previous;
     } else {
       repo.inputBox.value = previous;
-      const msg =
-        e.code === 'ENOENT'
-          ? 'Claude Code CLI not found. Install it (https://claude.com/claude-code) or set "claudeCommitMsg.claudePath".'
-          : 'Claude commit message failed: ' + e.message;
-      vscode.window.showErrorMessage(msg);
+      showError(e);
     }
   } finally {
     current = null;
     await setRunning(false);
   }
+}
+
+async function showError(e) {
+  if (e.code === 'authentication_failed' || /not logged in|\/login/i.test(e.message)) {
+    const login = 'Log In';
+    const pick = await vscode.window.showErrorMessage(
+      'You are not logged in to Claude Code. Log in once in a terminal, then try again.',
+      login,
+    );
+    if (pick === login) openLoginTerminal();
+  } else if (e.code === 'ENOENT') {
+    const install = 'Install Claude Code';
+    const pick = await vscode.window.showErrorMessage(
+      'Claude Code CLI not found. Install it, or set "claudeCommitMsg.claudePath".',
+      install,
+    );
+    if (pick === install) vscode.env.openExternal(vscode.Uri.parse('https://claude.com/claude-code'));
+  } else {
+    vscode.window.showErrorMessage('Claude commit message failed: ' + e.message);
+  }
+}
+
+// Interactive `claude` offers the browser login when there is no session.
+function openLoginTerminal() {
+  const cfg = vscode.workspace.getConfiguration('claudeCommitMsg');
+  const bin = cfg.get('claudePath') || 'claude';
+  const term = vscode.window.createTerminal({ name: 'Claude Code Login' });
+  term.show();
+  const quoted = /\s/.test(bin) ? `"${bin}"` : bin;
+  term.sendText(process.platform === 'win32' && quoted !== bin ? `& ${quoted}` : quoted);
 }
 
 function stop() {
