@@ -2,7 +2,7 @@
   "name": "claude-code-commit-message",
   "displayName": "Commit Message Generator for Claude Code",
   "description": "One click in Source Control writes a commit message from your changes, using your local Claude Code CLI login. No API key needed.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "publisher": "halilkaplan",
   "license": "MIT",
   "engines": {
@@ -25,7 +25,7 @@
       },
       {
         "command": "claudeCommitMsg.stop",
-        "title": "Stop Generating Commit Message",
+        "title": "Generating Commit Message… (Click to Stop)",
         "icon": "$(debug-stop)"
       }
     ],
