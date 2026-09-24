@@ -19,7 +19,7 @@ It runs through the **Claude Code CLI you are already logged into**, so there is
 
 ### Branch names from your changes
 
-Started working on `main` and want a branch for it? Click the branch button next to ✨ (also under **⋯ → Branch → Create Branch from Changes (Claude)**, or in the Command Palette).
+Started working on `main` and want a branch for it? Click the branch button next to ✨ (also under **⋯ → Branch → Generate New Branch from Changes (Claude)**, or in the Command Palette).
 
 Claude suggests a short name such as `feat/add-login-page`, following the style of your existing branches. You can edit it, and Enter creates the branch and switches to it. Your uncommitted changes come along.
 
