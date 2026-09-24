@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.1
+
+- The branch button now sits right after the ✨ button in the Source Control title bar, and is named "Generate New Branch from Changes (Claude)".
+
 ## 1.1.0
 
 - Add branch naming from changes with Claude
