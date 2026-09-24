@@ -1,7 +1,8 @@
 name: Build & Release
 
-# Every push to main builds the extension. If the version in package.json is not
-# on the stores yet, it is published there and a GitHub Release (with tag) is created.
+# Every push to main builds the extension. The version is bumped from the commit types
+# since the last release (see .github/scripts/bump.js); when there is something to release,
+# the bump is committed back to main, published to the stores and a GitHub Release is created.
 on:
   push:
     branches: [main]
@@ -25,6 +26,8 @@ jobs:
       PUBLISH: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
 
       - uses: actions/setup-node@v7
         with:
@@ -32,6 +35,19 @@ jobs:
 
       - name: Syntax check
         run: node --check extension.js
+
+      - name: Decide version
+        id: bump
+        run: node .github/scripts/bump.js ${{ env.PUBLISH != 'true' && '--dry-run' || '' }}
+
+      # Pushes made with GITHUB_TOKEN do not trigger another workflow run.
+      - name: Commit version bump
+        if: env.PUBLISH == 'true' && steps.bump.outputs.bumped == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "chore(release): v${{ steps.bump.outputs.version }}"
+          git push origin HEAD:main
 
       - name: Package
         run: |
@@ -45,7 +61,7 @@ jobs:
           name: vsix
           path: '*.vsix'
 
-      # --skip-duplicate: a push that does not change the version is a no-op here.
+      # --skip-duplicate: a version that is already on the store is left alone.
       - name: Publish to VS Code Marketplace
         if: env.PUBLISH == 'true' && env.VSCE_PAT != ''
         run: npx -y @vscode/vsce publish --skip-duplicate --packagePath "$VSIX"
@@ -59,11 +75,11 @@ jobs:
         run: echo "::warning::VSCE_PAT secret is not set, skipped publishing to the VS Code Marketplace."
 
       - name: GitHub Release
-        if: env.PUBLISH == 'true'
+        if: env.PUBLISH == 'true' && steps.bump.outputs.release == 'true'
         run: |
           if gh release view "v$VERSION" >/dev/null 2>&1; then
             echo "Release v$VERSION already exists."
             exit 0
           fi
           awk -v v="## $VERSION" '$0==v{f=1;next} /^## /{f=0} f' CHANGELOG.md > notes.md
-          gh release create "v$VERSION" "$VSIX" --target "$GITHUB_SHA" --title "v$VERSION" --notes-file notes.md
+          gh release create "v$VERSION" "$VSIX" --target "$(git rev-parse HEAD)" --title "v$VERSION" --notes-file notes.md
