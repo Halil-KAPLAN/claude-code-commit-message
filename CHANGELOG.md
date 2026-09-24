@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.2
+
+- Fix: with no changes, the ✨ and branch buttons no longer get stuck on ⏹. They show a message instead.
+- Fix: the branch name check now catches every existing branch, not just the 15 most recent.
+- README rewritten to cover both features.
+
 ## 1.1.1
 
 - The branch button now sits right after the ✨ button in the Source Control title bar, and is named "Generate New Branch from Changes (Claude)".
