@@ -1,6 +1,6 @@
 # Commit Message Generator for Claude Code
 
-A **Visual Studio Code extension** that writes your Git commit messages with Claude Code.
+A **Visual Studio Code extension** that writes your Git commit messages, and names new branches, with Claude Code.
 
 **Install:** [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=halilkaplan.claude-code-commit-message), or search for *Commit Message Generator for Claude Code* in the VS Code Extensions view (`Ctrl+Shift+X`). A `.vsix` for manual install is on the [Releases](https://github.com/Halil-KAPLAN/claude-code-commit-message/releases) page.
 
@@ -16,6 +16,12 @@ It runs through the **Claude Code CLI you are already logged into**, so there is
 - **Staged-aware:** if you have staged changes, only those are described. Otherwise it describes all changes, including new files.
 - **Matches your style:** your recent commit subjects are included, so the message follows your conventions. The format is Conventional Commits (`feat: …`, `fix: …`).
 - Works on Windows, macOS, Linux, WSL and Remote SSH.
+
+### Branch names from your changes
+
+Started working on `main` and want a branch for it? Click the branch button next to ✨ (also under **⋯ → Branch → Create Branch from Changes (Claude)**, or in the Command Palette).
+
+Claude suggests a short name such as `feat/add-login-page`, following the style of your existing branches. You can edit it, and Enter creates the branch and switches to it. Your uncommitted changes come along.
 
 ## Requirements
 
@@ -38,7 +44,7 @@ Download the `.vsix` from [Releases](https://github.com/Halil-KAPLAN/claude-code
 
 ## Privacy
 
-Your diff and your last 10 commit subjects are sent to Anthropic through your own Claude Code session. Nothing else is collected.
+Your diff and your last 10 commit subjects (for branch names: your local branch names) are sent to Anthropic through your own Claude Code session. Nothing else is collected.
 
 ---
 
