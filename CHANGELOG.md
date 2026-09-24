@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.0
+
+- Add branch naming from changes with Claude
+
 ## 1.0.2
 
 - Clear error with a **Log In** button when Claude Code is not logged in (previously the CLI's error text could end up in the commit box).
