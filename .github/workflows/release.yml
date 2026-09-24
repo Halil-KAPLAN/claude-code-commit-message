@@ -1,13 +1,19 @@
 name: Build & Release
 
+# Every push to main builds the extension. If the version in package.json is not
+# on the stores yet, it is published there and a GitHub Release (with tag) is created.
 on:
   push:
     branches: [main]
-    tags: ['v*']
   pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   build:
@@ -15,6 +21,8 @@ jobs:
     env:
       VSCE_PAT: ${{ secrets.VSCE_PAT }}
       OVSX_PAT: ${{ secrets.OVSX_PAT }}
+      GH_TOKEN: ${{ github.token }}
+      PUBLISH: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
     steps:
       - uses: actions/checkout@v7
 
@@ -29,6 +37,7 @@ jobs:
         run: |
           VERSION=$(node -p "require('./package.json').version")
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "VSIX=claude-code-commit-message-$VERSION.vsix" >> "$GITHUB_ENV"
           npx -y @vscode/vsce package -o "claude-code-commit-message-$VERSION.vsix"
 
       - uses: actions/upload-artifact@v7
@@ -36,23 +45,25 @@ jobs:
           name: vsix
           path: '*.vsix'
 
-      - name: Tag must match package.json version
-        if: startsWith(github.ref, 'refs/tags/v')
-        run: test "$GITHUB_REF_NAME" = "v$VERSION" || { echo "Tag $GITHUB_REF_NAME != v$VERSION"; exit 1; }
-
+      # --skip-duplicate: a push that does not change the version is a no-op here.
       - name: Publish to VS Code Marketplace
-        if: startsWith(github.ref, 'refs/tags/v') && env.VSCE_PAT != ''
-        run: npx -y @vscode/vsce publish --skip-duplicate --packagePath "claude-code-commit-message-$VERSION.vsix"
+        if: env.PUBLISH == 'true' && env.VSCE_PAT != ''
+        run: npx -y @vscode/vsce publish --skip-duplicate --packagePath "$VSIX"
 
       - name: Publish to Open VSX
-        if: startsWith(github.ref, 'refs/tags/v') && env.OVSX_PAT != ''
-        run: npx -y ovsx publish "claude-code-commit-message-$VERSION.vsix" -p "$OVSX_PAT" --skip-duplicate
+        if: env.PUBLISH == 'true' && env.OVSX_PAT != ''
+        run: npx -y ovsx publish "$VSIX" -p "$OVSX_PAT" --skip-duplicate
+
+      - name: Missing Marketplace token
+        if: env.PUBLISH == 'true' && env.VSCE_PAT == ''
+        run: echo "::warning::VSCE_PAT secret is not set, skipped publishing to the VS Code Marketplace."
 
       - name: GitHub Release
-        if: startsWith(github.ref, 'refs/tags/v')
-        env:
-          GH_TOKEN: ${{ github.token }}
+        if: env.PUBLISH == 'true'
         run: |
+          if gh release view "v$VERSION" >/dev/null 2>&1; then
+            echo "Release v$VERSION already exists."
+            exit 0
+          fi
           awk -v v="## $VERSION" '$0==v{f=1;next} /^## /{f=0} f' CHANGELOG.md > notes.md
-          gh release create "$GITHUB_REF_NAME" "claude-code-commit-message-$VERSION.vsix" \
-            --title "$GITHUB_REF_NAME" --notes-file notes.md
+          gh release create "v$VERSION" "$VSIX" --target "$GITHUB_SHA" --title "v$VERSION" --notes-file notes.md
