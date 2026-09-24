@@ -141,6 +141,12 @@ async function askClaude(prompt, { system, onText }) {
   return text;
 }
 
+// From the git extension's already-loaded state, so there is nothing to wait for.
+function hasChanges(repo) {
+  const st = repo.state;
+  return [st.indexChanges, st.workingTreeChanges, st.mergeChanges, st.untrackedChanges].some((c) => c && c.length);
+}
+
 function setRunning(v) {
   return vscode.commands.executeCommand('setContext', 'claudeCommitMsg.running', v);
 }
@@ -150,6 +156,7 @@ async function generate(arg) {
   const api = vscode.extensions.getExtension('vscode.git').exports.getAPI(1);
   const repo = pickRepo(api, arg);
   if (!repo) return vscode.window.showWarningMessage('No git repository found.');
+  if (!hasChanges(repo)) return void vscode.window.showInformationMessage('No changes to describe.');
 
   const cfg = vscode.workspace.getConfiguration('claudeCommitMsg');
   const cwd = repo.rootUri.fsPath;
@@ -164,7 +171,7 @@ async function generate(arg) {
         cwd,
         Math.max(2000, Number(cfg.get('maxDiffChars')) || 60000),
       );
-      if (!diff.trim()) return vscode.window.showInformationMessage('No changes to describe.');
+      if (!diff.trim()) return void vscode.window.showInformationMessage('No changes to describe.');
       if (current.stopped) return;
 
       const recent = await run(api.git.path, ['log', '-10', '--pretty=%s'], { cwd }).catch(() => '');
@@ -228,6 +235,7 @@ async function createBranch(arg) {
   const api = vscode.extensions.getExtension('vscode.git').exports.getAPI(1);
   const repo = pickRepo(api, arg);
   if (!repo) return vscode.window.showWarningMessage('No git repository found.');
+  if (!hasChanges(repo)) return void vscode.window.showInformationMessage('No changes to name a branch after.');
 
   const cfg = vscode.workspace.getConfiguration('claudeCommitMsg');
   const cwd = repo.rootUri.fsPath;
@@ -250,14 +258,11 @@ async function createBranch(arg) {
           vscode.window.showInformationMessage('No changes to name a branch after.');
           return;
         }
-        const branches = await git([
-          'for-each-ref',
-          '--sort=-committerdate',
-          '--count=15',
-          '--format=%(refname:short)',
-          'refs/heads',
-        ]).catch(() => '');
-        existing = new Set(branches.split('\n').filter(Boolean));
+        const refs = ['for-each-ref', '--sort=-committerdate', '--format=%(refname:short)', 'refs/heads'];
+        const all = (await git(refs).catch(() => '')).split('\n').filter(Boolean);
+        existing = new Set(all);
+        // The most recent ones are enough to show the naming style.
+        const branches = all.slice(0, 15).join('\n');
         const prompt = [
           'Suggest a short git branch name for the changes below.',
           'Rules: lowercase English words, kebab-case, 2-5 words, at most 40 characters, ASCII only.',
