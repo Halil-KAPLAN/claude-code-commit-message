@@ -94,7 +94,7 @@
             "Better wording, slower",
             "Best quality, slowest"
           ],
-          "description": "Claude model used to write the message."
+          "markdownDescription": "Claude model used for commit messages and branch names.\n\n**Note:** each option always runs the newest version of that model your Claude Code CLI offers, so new releases are picked up automatically. The exact version (for example *Claude Haiku 5.5*) is shown in the status bar after each run."
         },
         "claudeCommitMsg.language": {
           "type": "string",

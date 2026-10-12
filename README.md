@@ -48,7 +48,7 @@ Also available under **⋯ → Branch → Generate New Branch from Changes (Clau
 
 | Setting | Default | Description |
 | --- | --- | --- |
-| `claudeCommitMsg.model` | `haiku` | `haiku` (fastest), `sonnet`, `opus`. Used for both features. |
+| `claudeCommitMsg.model` | `haiku` | `haiku` (fastest), `sonnet`, `opus`. Always the newest version of that model; the exact version is shown in the status bar after each run. Used for both features. |
 | `claudeCommitMsg.language` | `English` | Language of the commit message |
 | `claudeCommitMsg.maxDiffChars` | `60000` | Longer diffs are truncated |
 | `claudeCommitMsg.claudePath` | `claude` | Path to the CLI if it is not on your PATH |

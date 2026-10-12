@@ -77,12 +77,20 @@ const clean = (s) =>
     .replace(/^```\w*\n?|\n?```$/g, '')
     .trim();
 
+// "claude-haiku-5-5" or "claude-haiku-4-5-20251001" -> "Claude Haiku 5.5"; anything else is shown as is.
+function modelLabel(id) {
+  const m = /^claude-([a-z]+)-(\d+)(?:-(\d{1,2}))?(?:-\d{8})?$/.exec(id);
+  if (!m) return id;
+  return `Claude ${m[1].charAt(0).toUpperCase() + m[1].slice(1)} ${m[2]}${m[3] ? '.' + m[3] : ''}`;
+}
+
 // Runs one prompt through the Claude Code CLI; onText receives the text so far while it streams.
 async function askClaude(prompt, { system, onText }) {
   const cfg = vscode.workspace.getConfiguration('claudeCommitMsg');
   let text = '',
     buf = '',
-    failure = null;
+    failure = null,
+    resolved = null;
   const model = MODELS.includes(cfg.get('model')) ? cfg.get('model') : 'haiku';
   const claude = claudeCommand(cfg.get('claudePath') || 'claude', [
     '-p',
@@ -119,6 +127,8 @@ async function askClaude(prompt, { system, onText }) {
         } catch {
           continue;
         }
+        // The alias (haiku, sonnet, opus) resolves to the CLI's latest version of that model.
+        if (ev.type === 'system' && ev.subtype === 'init' && ev.model) resolved = ev.model;
         const d = ev.type === 'stream_event' && ev.event.type === 'content_block_delta' && ev.event.delta;
         if (d && d.type === 'text_delta') {
           text += d.text;
@@ -138,6 +148,7 @@ async function askClaude(prompt, { system, onText }) {
     err.code = failure.code;
     throw err;
   }
+  if (resolved) vscode.window.setStatusBarMessage(`$(sparkle) Generated with ${modelLabel(resolved)}`, 10000);
   return text;
 }
 
