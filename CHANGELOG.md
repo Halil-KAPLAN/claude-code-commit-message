@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.0
+
+- Show resolved model version in status bar
+
 ## 1.1.2
 
 - Fix: with no changes, the ✨ and branch buttons no longer get stuck on ⏹. They show a message instead.
